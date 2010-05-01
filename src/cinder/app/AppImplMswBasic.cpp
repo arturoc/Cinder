@@ -20,11 +20,12 @@
  POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "cinder/app/AppImplLinuxBasic.h"
+#include "cinder/app/AppImplMswBasic.h"
 #include "cinder/app/AppBasic.h"
-#include "cinder/app/AppImplLinuxRenderer.h"
+#include "cinder/app/AppImplMswRenderer.h"
 #include "cinder/app/Renderer.h"
 
+#include <windowsx.h>
 
 using std::vector;
 using std::string;
@@ -37,14 +38,14 @@ namespace cinder { namespace app {
 static const wchar_t *WINDOWED_WIN_CLASS_NAME = TEXT("CinderWinClass");
 static const wchar_t *FULLSCREEN_WIN_CLASS_NAME = TEXT("CinderWinFSClass");
 
-AppImplLinuxBasic::AppImplLinuxBasic( AppBasic *aApp )
-	: AppImplLinux( aApp ), mApp( aApp ), mHasBeenInitialized( false )
+AppImplMswBasic::AppImplMswBasic( AppBasic *aApp )
+	: AppImplMsw( aApp ), mApp( aApp ), mHasBeenInitialized( false )
 {
 	mShouldQuit = false;
 	mIsDragging = false;
 }
 
-void AppImplLinuxBasic::run()
+void AppImplMswBasic::run()
 {
 	mDisplay = mApp->getSettings().getDisplay();
 	if( ! mDisplay )
@@ -98,7 +99,7 @@ void AppImplLinuxBasic::run()
 	delete mApp;
 }
 
-bool AppImplLinuxBasic::createWindow( int *width, int *height )
+bool AppImplMswBasic::createWindow( int *width, int *height )
 {
 	const char *title = "Cinder";
 	int bits = 32;
@@ -197,7 +198,7 @@ bool AppImplLinuxBasic::createWindow( int *width, int *height )
 	return true;									// Success
 }
 
-void AppImplLinuxBasic::killWindow( bool wasFullScreen )
+void AppImplMswBasic::killWindow( bool wasFullScreen )
 {
 	mApp->getRenderer()->kill();
 
@@ -218,7 +219,7 @@ void AppImplLinuxBasic::killWindow( bool wasFullScreen )
 	mWnd = 0;
 }
 
-void AppImplLinuxBasic::toggleFullScreen()
+void AppImplMswBasic::toggleFullScreen()
 {
 	bool prevFullScreen = mFullScreen;
 	HDC oldDC = mDC;
@@ -263,33 +264,33 @@ void AppImplLinuxBasic::toggleFullScreen()
 	mApp->privateResize__( mApp->getWindowWidth(), mApp->getWindowHeight() );
 }
 
-void AppImplLinuxBasic::setWindowWidth( int aWindowWidth )
+void AppImplMswBasic::setWindowWidth( int aWindowWidth )
 {
 	int screenWidth, screenHeight;
 	getScreenSize( aWindowWidth, mApp->getWindowHeight(), &screenWidth, &screenHeight );
 	::SetWindowPos( mWnd, HWND_TOP, 0, 0, screenWidth, screenHeight, SWP_NOMOVE );
 }
 
-void AppImplLinuxBasic::setWindowHeight( int aWindowHeight )
+void AppImplMswBasic::setWindowHeight( int aWindowHeight )
 {
 	int screenWidth, screenHeight;
 	getScreenSize( mApp->getWindowWidth(), aWindowHeight, &screenWidth, &screenHeight );
 	::SetWindowPos( mWnd, HWND_TOP, 0, 0, screenWidth, screenHeight, SWP_NOMOVE );
 }
 
-void AppImplLinuxBasic::setWindowSize( int aWindowWidth, int aWindowHeight )
+void AppImplMswBasic::setWindowSize( int aWindowWidth, int aWindowHeight )
 {
 	int screenWidth, screenHeight;
 	getScreenSize( aWindowWidth, aWindowHeight, &screenWidth, &screenHeight );
 	::SetWindowPos( mWnd, HWND_TOP, 0, 0, screenWidth, screenHeight, SWP_NOMOVE );
 }
 
-float AppImplLinuxBasic::setFrameRate( float aFrameRate )
+float AppImplMswBasic::setFrameRate( float aFrameRate )
 {
 	return aFrameRate;
 }
 
-void AppImplLinuxBasic::getScreenSize( int clientWidth, int clientHeight, int *resultWidth, int *resultHeight )
+void AppImplMswBasic::getScreenSize( int clientWidth, int clientHeight, int *resultWidth, int *resultHeight )
 {
 	RECT windowRect;
 	windowRect.left = windowRect.top = 0;
@@ -359,15 +360,15 @@ LRESULT CALLBACK WndProc(	HWND	mWnd,			// Handle For This Window
 							WPARAM	wParam,			// Additional Message Information
 							LPARAM	lParam)			// Additional Message Information
 {
-	AppImplLinuxBasic* impl = 0;
+	AppImplMswBasic* impl = 0;
 	
 	// if the message is WM_NCCREATE we need to hide 'this' in the window long
 	if( uMsg == WM_NCCREATE ) {
-		impl = reinterpret_cast<AppImplLinuxBasic*>(((LPCREATESTRUCT)lParam)->lpCreateParams);
+		impl = reinterpret_cast<AppImplMswBasic*>(((LPCREATESTRUCT)lParam)->lpCreateParams);
 		::SetWindowLongPtr( mWnd, GWL_USERDATA, (__int3264)(LONG_PTR)impl ); 
 	}
 	else // the warning on this line is harmless
-		impl = reinterpret_cast<AppImplLinuxBasic*>( ::GetWindowLongPtr( mWnd, GWL_USERDATA ) );
+		impl = reinterpret_cast<AppImplMswBasic*>( ::GetWindowLongPtr( mWnd, GWL_USERDATA ) );
 
 	if( ! impl )
 		return DefWindowProc( mWnd, uMsg, wParam, lParam );		
