@@ -22,20 +22,20 @@
 
 #pragma once
 
-#include <windows.h>
 #undef min
 #undef max
 
-#include "cinder/app/AppImplMsw.h"
-#include "cinder/app/AppImplMswRenderer.h"
+#include "cinder/app/AppImplLinux.h"
+#include "cinder/app/AppImplLinuxRenderer.h"
 #include "cinder/Display.h"
 
 namespace cinder { namespace app {
 
+//extern "C" LRESULT CALLBACK WndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
-class AppImplMswBasic : public AppImplMsw {
+class AppImplLinuxBasic : public AppImplLinux {
  public:
-	AppImplMswBasic( class AppBasic *aApp  );
+	AppImplLinuxBasic( class AppBasic *aApp  );
 	void	run();
 
 	class AppBasic*		getApp() { return mApp; }
@@ -63,6 +63,10 @@ class AppImplMswBasic : public AppImplMsw {
 	class AppBasic	*mApp;
 	
 	// Windows window variables
+	//HWND				mWnd;
+	//HDC					mDC;
+	//HINSTANCE			mInstance;
+	//DWORD				mWindowStyle, mWindowExStyle;
 	double				mNextFrameTime;
 	Display				*mDisplay;
 

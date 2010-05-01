@@ -27,9 +27,9 @@
 #include <string>
 #include <vector>
 
-#if defined( CINDER_MAC )
+#ifndef CINDER_MSW
 	#include <termios.h>
-#elif defined( CINDER_MSW )
+#else
 	#include <windows.h>
 #endif
 

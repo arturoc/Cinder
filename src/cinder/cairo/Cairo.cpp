@@ -33,6 +33,8 @@
 #elif defined( CINDER_MSW )
 	#include "cinder/app/App.h"
 	#include <cairo-win32.h>
+#else
+	#include <cairo/cairo-xlib.h>
 #endif
 
 using std::vector;
@@ -1617,9 +1619,11 @@ void Context::setFont( const cinder::Font &font )
 	cairo_font_face_t *cairoFont = cairo_quartz_font_face_create_for_cgfont( font.getCgFontRef() );
 #elif defined( CINDER_MSW )
 	cairo_font_face_t *cairoFont = cairo_win32_font_face_create_for_logfontw( &font.getLogfont() );
+#elif defined( CINDER_LINUX )
+	//cairo_font_face_t *cairoFont = cairo_linux_font_face_create_for_logfontw( &font.getLogfont() ); //TODO: create this
 #endif
-	cairo_set_font_face( mCairo, cairoFont );
-	cairo_font_face_destroy( cairoFont );
+	//cairo_set_font_face( mCairo, cairoFont );
+	//cairo_font_face_destroy( cairoFont );
 }
 
 void Context::setFontFace( const FontFace &font_face )

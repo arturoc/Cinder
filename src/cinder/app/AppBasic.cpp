@@ -27,6 +27,8 @@
 #	import "AppImplCocoaBasic.h"
 #elif defined( CINDER_MSW )
 #	include "cinder/app/AppImplMswBasic.h"
+#elif defined( CINDER_LINUX )
+#	include "cinder/app/AppImplLinuxBasic.h"
 #endif
 
 namespace cinder { namespace app {
@@ -61,8 +63,11 @@ void AppBasic::launch( const char *title, int argc, char * const argv[] )
 
 #if defined( CINDER_COCOA )
 	mImpl = [[::AppImplCocoaBasic alloc] init:this];
-#else
+#elif defined( CINDER_MSW )
 	mImpl = new AppImplMswBasic( this );	
+	mImpl->run();
+#elif defined( CINDER_LINUX )
+	mImpl = new AppImplLinuxBasic( this );
 	mImpl->run();
 #endif
 // NOTHING AFTER THIS LINE RUNS
@@ -79,7 +84,7 @@ int AppBasic::getWindowWidth() const
 {
 #if defined( CINDER_COCOA )
 	return [mImpl getWindowWidth];
-#elif defined( CINDER_MSW )
+#else
 	return mImpl->getWindowWidth();
 #endif
 }
@@ -88,7 +93,7 @@ int AppBasic::getWindowHeight() const
 {
 #if defined( CINDER_COCOA )
 	return [mImpl getWindowHeight];
-#elif defined( CINDER_MSW )
+#else
 	return mImpl->getWindowHeight();
 #endif
 }
@@ -97,7 +102,7 @@ void AppBasic::setWindowWidth( int windowWidth )
 {
 #if defined( CINDER_COCOA )
 	[mImpl setWindowWidth:windowWidth];
-#elif defined( CINDER_MSW )
+#else
 	mImpl->setWindowWidth( windowWidth );
 #endif
 }
@@ -106,7 +111,7 @@ void AppBasic::setWindowHeight( int windowHeight )
 {
 #if defined( CINDER_COCOA )
 	[mImpl setWindowHeight:windowHeight];
-#elif defined( CINDER_MSW )
+#else
 	mImpl->setWindowHeight( windowHeight );
 #endif
 }
@@ -115,7 +120,7 @@ void AppBasic::setWindowSize( int windowWidth, int windowHeight )
 {
 #if defined( CINDER_COCOA )
 	[mImpl setWindowSizeWithWidth:windowWidth height:windowHeight];
-#elif defined( CINDER_MSW )
+#else
 	mImpl->setWindowSize( windowWidth, windowHeight );
 #endif
 }
@@ -124,7 +129,7 @@ float AppBasic::getFrameRate() const
 {
 #if defined( CINDER_COCOA )
 	return [mImpl getFrameRate];
-#elif defined( CINDER_MSW )
+#else
 	return mImpl->getFrameRate();
 #endif
 }
@@ -133,7 +138,7 @@ void AppBasic::setFrameRate( float aFrameRate )
 {
 #if defined( CINDER_COCOA )
 	[mImpl setFrameRate:aFrameRate];
-#elif defined( CINDER_MSW )
+#else
 	mImpl->setFrameRate( aFrameRate );
 #endif
 }
@@ -142,7 +147,7 @@ bool AppBasic::isFullScreen() const
 {
 #if defined( CINDER_COCOA )
 	return [mImpl isFullScreen];
-#elif defined( CINDER_MSW )
+#else
 	return mImpl->isFullScreen();
 #endif
 }
@@ -188,6 +193,8 @@ void AppBasic::hideCursor()
 	[NSCursor hide];
 #elif defined( CINDER_MSW )
 	AppImplMsw::hideCursor();
+#elif defined( CINDER_LINUX )
+	AppImplLinux::hideCursor();
 #endif
 }
 
@@ -197,6 +204,8 @@ void AppBasic::showCursor()
 	[NSCursor unhide];
 #elif defined( CINDER_MSW )
 	AppImplMsw::showCursor();
+#elif defined( CINDER_LINUX )
+	AppImplLinux::showCursor();
 #endif
 }
 

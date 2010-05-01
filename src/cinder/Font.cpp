@@ -78,7 +78,7 @@ class FontManager
 	
 #if defined( CINDER_COCOA )
 	NSFontManager		*nsFontManager;
-#else
+#elif defined( CINDER_MSW )
 	HDC					mFontDc;
 	Gdiplus::Graphics	*mGraphics;
 #endif
@@ -92,7 +92,7 @@ FontManager::FontManager()
 #if defined( CINDER_COCOA )
 	nsFontManager = [NSFontManager sharedFontManager];
 	[nsFontManager retain];
-#else
+#elif defined( CINDER_MSW )
 	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 	ULONG_PTR gdiplusToken;
 	Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);	
@@ -136,7 +136,7 @@ const vector<string>& FontManager::getNames( bool forceRefresh )
 			NSString *str = [fontArray objectAtIndex:i];
 			mFontNames.push_back( string( [str UTF8String] ) );
 		}
-#else
+#elif defined( CINDER_MSW )
 		// consider enumerating character sets? DEFAULT_CHARSET potentially here
 		::LOGFONT lf = { 0, 0, 0, 0, 0, 0, 0, 0, ANSI_CHARSET, 0, 0, 0, 0, '\0' };
 		::EnumFontFamiliesEx( getFontDc(), &lf, (FONTENUMPROC)EnumFontFamiliesExProc, reinterpret_cast<LPARAM>( &mFontNames ), 0 );	
@@ -417,7 +417,7 @@ Font::Obj::Obj( const string &aName, float aSize )
 	::CFStringRef fullName = ::CGFontCopyFullName( mCGFont );
 	string result = cocoa::convertCfString( fullName );
 	::CFRelease( fullName );
-#else
+#elif defined( CINDER_MSW )
 	FontManager::instance(); // force GDI+ init
 	assert( sizeof(wchar_t) == 2 );
     wstring faceName = toUtf16( mName );
@@ -483,7 +483,7 @@ Font::Obj::~Obj()
 #if defined( CINDER_COCOA )
 	::CGFontRelease( mCGFont );
 	::CFRelease( mCTFont );
-#else
+#elif defined( CINDER_MSW )
 	if( mHfont ) // this should be replaced with something exception-safe
 		::DeleteObject( mHfont ); 
 #endif

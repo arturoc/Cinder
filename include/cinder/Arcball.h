@@ -23,6 +23,7 @@
 #pragma once
 
 #include "cinder/Vector.h"
+#include "cinder/Quaternion.h"
 
 namespace cinder {
 

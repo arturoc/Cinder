@@ -28,6 +28,9 @@
 #include <assert.h>
 #include <math.h>
 #include <float.h>
+#include <cstring>
+#include <cstdlib>
+#include <cstdio>
 
 #if defined(_MSC_VER) && _MSC_VER<=1200
 #   pragma warning(push, 3)
@@ -76,7 +79,10 @@
 #   include <shellapi.h>
 #endif
 
+#ifndef _UNIX
 #include "cinder/gl/gl.h"
+#endif
+
 #define  ANT_OGL_HEADER_INCLUDED
 
 

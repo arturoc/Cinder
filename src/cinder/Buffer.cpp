@@ -24,6 +24,7 @@
 #include <zlib.h>
 #include <cmath>
 #include <iostream>
+#include <cstring>
 
 namespace cinder {
 

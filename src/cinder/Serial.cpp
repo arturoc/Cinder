@@ -28,6 +28,7 @@
 #include <string>
 #include <iostream>
 #include <fcntl.h>
+#include <cstring>
 
 #if defined( CINDER_MAC )
 	#include <termios.h>
@@ -230,11 +231,11 @@ void Serial::writeBytes( const void *data, size_t numBytes )
 	size_t totalBytesWritten = 0;
 	
 	while( totalBytesWritten < numBytes ) {
-#if defined( CINDER_MAC )
+#ifndef CINDER_MSW
 		int bytesWritten = ::write( mObj->mFd, data, numBytes - totalBytesWritten );
 		if( ( bytesWritten == -1 ) && ( errno != EAGAIN ) )
 			throw SerialExcReadFailure();	
-#elif defined( CINDER_MSW )
+#else
 		::DWORD bytesWritten;
 		if( ! ::WriteFile( mObj->mDeviceHandle, data, numBytes - totalBytesWritten, &bytesWritten, 0 ) )
 			throw SerialExcWriteFailure();
@@ -247,11 +248,11 @@ void Serial::readBytes( void *data, size_t numBytes )
 {
 	size_t totalBytesRead = 0;
 	while( totalBytesRead < numBytes ) {
-#if defined( CINDER_MAC )
+#ifndef CINDER_MSW
 		int bytesRead = ::read( mObj->mFd, data, numBytes - totalBytesRead );
 		if( ( bytesRead == -1 ) && ( errno != EAGAIN ) )
 			throw SerialExcReadFailure();
-#elif defined( CINDER_MSW )
+#else
 		::DWORD bytesRead = 0;
 		if( ! ::ReadFile( mObj->mDeviceHandle, data, numBytes - totalBytesRead, &bytesRead, 0 ) )
 			throw SerialExcReadFailure();
@@ -265,9 +266,9 @@ void Serial::readBytes( void *data, size_t numBytes )
 
 size_t Serial::readAvailableBytes( void *data, size_t maximumBytes )
 {
-#if defined( CINDER_MAC )
+#ifndef CINDER_MSW
 	int bytesRead = ::read( mObj->mFd, data, maximumBytes );
-#elif defined( CINDER_MSW )
+#else
 	::DWORD bytesRead = 0;
 	if( ! ::ReadFile( mObj->mDeviceHandle, data, maximumBytes, &bytesRead, 0 ) )
 		throw SerialExcReadFailure();

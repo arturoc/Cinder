@@ -34,7 +34,7 @@
 	#import <Foundation/NSFileManager.h>
 	#include <cxxabi.h>
 	#include <execinfo.h>
-#else
+#elif defined( CINDER_MSW )
 	#include <windows.h>
 	#include <Shlwapi.h>
 	#include <shlobj.h>
@@ -56,10 +56,12 @@ std::string expandPath( const std::string &path )
 	NSString *pathNS = [NSString stringWithCString:path.c_str() encoding:NSUTF8StringEncoding];
 	NSString *resultPath = [pathNS stringByStandardizingPath];
 	result = string( [resultPath cStringUsingEncoding:NSUTF8StringEncoding] );
-#else
+#elif defined( CINDER_MSW )
 	char buffer[MAX_PATH];
 	::PathCanonicalizeA( buffer, path.c_str() );
 	result = buffer; 
+#elif defined( CINDER_LINUX )
+	return path;
 #endif
 
 	return result;	
@@ -73,11 +75,13 @@ std::string getHomeDirectory()
 	NSString *home = ::NSHomeDirectory();
 	result = [home cStringUsingEncoding:NSUTF8StringEncoding];
 	result += "/";
-#else
+#elif defined( CINDER_MSW )
 	char buffer[MAX_PATH];
 	::SHGetFolderPathA( 0, CSIDL_PROFILE, NULL, SHGFP_TYPE_CURRENT, buffer );
 	result = buffer;
 	result += "\\";
+#elif defined( CINDER_LINUX )
+	return "/home/arturo/";
 #endif
 
 	return result;
@@ -91,11 +95,13 @@ std::string getDocumentsDirectory()
 	NSArray *arrayPaths = ::NSSearchPathForDirectoriesInDomains( NSDocumentDirectory, NSUserDomainMask, YES );
 	NSString *docDir = [arrayPaths objectAtIndex:0];
 	return cocoa::convertNsString( docDir ) + "/";
-#else
+#elif defined( CINDER_MSW )
 	char buffer[MAX_PATH];
 	::SHGetFolderPathA( 0, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, buffer );
 	result = buffer;
 	result += "\\";
+#elif defined( CINDER_LINUX )
+	return "~";
 #endif
 
 	return result;
@@ -138,7 +144,7 @@ bool createDirectories( const std::string &path, bool createParents )
 #if defined( CINDER_COCOA )
 	NSString *pathNS = [NSString stringWithCString:path.c_str() encoding:NSUTF8StringEncoding];
 	return static_cast<bool>( [[NSFileManager defaultManager] createDirectoryAtPath:pathNS withIntermediateDirectories:YES attributes:nil error:nil] );
-#else
+#elif defined( CINDER_MSW )
 	return ::SHCreateDirectoryExA( NULL, path.c_str(), NULL ) == ERROR_SUCCESS;
 #endif
 }
@@ -162,7 +168,7 @@ wstring toUtf16( const string &utf8 )
 	}
 
 	return wstring( &resultString[0] );
-#else
+#elif defined( CINDER_COCOA )
 	NSString *utf8NS = [NSString stringWithCString:utf8.c_str() encoding:NSUTF8StringEncoding];
 	return wstring( reinterpret_cast<const wchar_t*>( [utf8NS cStringUsingEncoding:NSUTF16LittleEndianStringEncoding] ) );
 #endif	
@@ -185,7 +191,7 @@ string toUtf8( const wstring &utf16 )
 	}
 
 	return string( &resultString[0] );
-#else
+#elif defined( CINDER_COCOA )
 	NSString *utf16NS = [NSString stringWithCString:reinterpret_cast<const char*>( utf16.c_str() ) encoding:NSUTF16LittleEndianStringEncoding];
 	return string( [utf16NS cStringUsingEncoding:NSUTF8StringEncoding] );	
 #endif
@@ -248,7 +254,7 @@ vector<string> stackTrace()
 #if defined( CINDER_MSW )
 	CinderStackWalker csw;
 	return csw.getEntries();
-#else
+#elif defined( CINDER_COCOA )
 	std::vector<std::string> result;
 	static const int MAX_DEPTH = 128;
 	void* callstack[MAX_DEPTH];
@@ -284,7 +290,10 @@ vector<string> stackTrace()
 	free( strs );
 	
 	return result;
+#elif defined( CINDER_LINUX )
+	return vector<string>();
 #endif
+
 }
 
 int16_t swapEndian( int16_t val ) { 

@@ -20,31 +20,33 @@
  POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "cinder/Rand.h"
-#if defined( CINDER_COCOA )
-#	include <mach/mach.h>
-#	include <mach/mach_time.h>
-#elif defined( CINDER_MSW ) 
-#	include <windows.h>
-#elif defined( CINDER_LINUX )
-#	include <sys/time.h>
-#endif
+#pragma once
 
-namespace cinder {
+#undef min
+#undef max
+
+#include "cinder/app/Renderer.h"
+
+namespace cinder { namespace app {
+
+class App;
+class AppImplLinuxBasic;
+
+class AppImplLinuxRenderer {
+ public:
+	AppImplLinuxRenderer( App *aApp ) : mApp( aApp ) {}
 	
-boost::mt19937 Rand::sBase( 310u );
-boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > Rand::sFloatGen( sBase, boost::uniform_real<float>( 0.0f, 1.0f ) );
-boost::variate_generator<boost::mt19937&, boost::uniform_int<> > Rand::sIntGen( sBase, boost::uniform_int<>( 0, std::numeric_limits<int32_t>::max() ) );
+	virtual bool	initialize(  ) = 0;
+	virtual void	prepareToggleFullScreen() {}
+	virtual void	finishToggleFullScreen() {}
+	virtual void	kill() = 0;
+	virtual void	defaultResize() const = 0;
+	virtual void	swapBuffers() const = 0;
+	virtual void	makeCurrentContext() = 0;
 
-void Rand::randomize()
-{
-#if defined( CINDER_COCOA )
-	sBase = boost::mt19937( mach_absolute_time() );
-#elif defined( CINDER_MSW )
-	sBase = boost::mt19937( ::GetTickCount() );
-#elif defined( CINDER_LINUX )
-	sBase = boost::mt19937( time(NULL) );
-#endif
-}
+ protected:
+	//HWND				mWnd;
+	App					*mApp;
+};
 
-} // ci
+} } // namespace cinder::app

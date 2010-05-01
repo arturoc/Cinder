@@ -180,7 +180,7 @@ const vector<Capture::Device>& Capture::getDevices( bool forceRefresh )
 		QTCaptureDevice *device = [devices objectAtIndex:i];
 		sDevices.push_back( Capture::Device( device ) );
 	}
-#else
+#elif defined( CINDER_MSW )
 	CaptureMgr::instance()->sTotalDevices = CaptureMgr::instanceVI()->listDevices( true );
 	for( int i = 0; i < CaptureMgr::instance()->sTotalDevices; ++i ) {
 		sDevices.push_back( Device( videoInput::getDeviceName( i ), i ) );
@@ -209,7 +209,7 @@ Capture::Obj::Obj( int32_t width, int32_t height, const Device &device )
 {
 #if defined( CINDER_MAC )
 	mImpl = [[::CaptureCocoa alloc] initWithDevice:mDevice width:width height:height];
-#else
+#elif defined( CINDER_MSW )
 	mDeviceID = device.getUniqueId();
 	if( ! CaptureMgr::instanceVI()->setupDevice( mDeviceID, mWidth, mHeight ) )
 		throw CaptureExcInitFail();
@@ -225,7 +225,7 @@ Capture::Obj::~Obj()
 #if defined( CINDER_MAC )
 	[((::CaptureCocoa*)mImpl) stopCapture];
 	[((::CaptureCocoa*)mImpl) release];
-#else
+#elif defined( CINDER_MSW )
 	CaptureMgr::instanceVI()->stopDevice( mDeviceID );
 #endif
 }
@@ -242,7 +242,7 @@ void Capture::start()
 {
 #if defined( CINDER_MAC )
 	[((::CaptureCocoa*)mObj->mImpl) startCapture];
-#else
+#elif defined( CINDER_MSW )
 	if( ! mObj->mIsCapturing ) {
 		if( ! CaptureMgr::instanceVI()->setupDevice( mObj->mDeviceID, mObj->mWidth, mObj->mHeight ) )
 			throw CaptureExcInitFail();
@@ -259,7 +259,7 @@ void Capture::stop()
 {
 #if defined( CINDER_MAC )
 	[((::CaptureCocoa*)mObj->mImpl) stopCapture];
-#else
+#elif defined( CINDER_MSW )
 	if( mObj->mIsCapturing ) {
 		CaptureMgr::instanceVI()->stopDevice( mObj->mDeviceID );
 		mObj->mIsCapturing = false;
@@ -271,7 +271,7 @@ bool Capture::isCapturing()
 {
 #if defined( CINDER_MAC )
 	return [((::CaptureCocoa*)mObj->mImpl) isCapturing];
-#else
+#elif defined( CINDER_MSW )
 	return mObj->mIsCapturing;
 #endif
 }
@@ -280,7 +280,7 @@ bool Capture::checkNewFrame() const
 {
 #if defined( CINDER_MAC )
 	return [((::CaptureCocoa*)mObj->mImpl) checkNewFrame];
-#else
+#elif defined( CINDER_MSW )
 	return CaptureMgr::instanceVI()->isFrameNew( mObj->mDeviceID );
 #endif	
 }
@@ -289,7 +289,7 @@ Surface8u Capture::getSurface() const
 {
 #if defined( CINDER_MAC )
 	return [((::CaptureCocoa*)mObj->mImpl) getCurrentFrame];
-#else
+#elif defined( CINDER_MSW )
 	if( CaptureMgr::instanceVI()->isFrameNew( mObj->mDeviceID ) ) {
 		mObj->mCurrentFrame = mObj->mSurfaceCache->getNewSurface();
 		CaptureMgr::instanceVI()->getPixels( mObj->mDeviceID, mObj->mCurrentFrame.getData(), false, true );

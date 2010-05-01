@@ -243,10 +243,17 @@ void cpuid( int whichlp, PLOGICALPROCESSORDATA p )
 bool System::hasSse2()
 {
 	if( ! instance()->mCachedValues[HAS_SSE2] ) {
-#if defined( CINDER_COCOA )	
+#if defined( CINDER_COCOA )
 		instance()->mHasSSE2 = ( getSysCtlValue<int>( "hw.optional.sse2" ) == 1 );
-#else
+#elif defined( CINDER_MSW )
 		instance()->mHasSSE2 = ( instance()->mCPUID_EDX & 0x04000000 ) != 0;
+#elif defined( CINDER_LINUX )
+		instance()->mHasSSE2 =
+				#ifdef __SSE2__
+					1;
+				#else
+					0;
+				#endif
 #endif
 		instance()->mCachedValues[HAS_SSE2] = true;
 	}
@@ -257,10 +264,17 @@ bool System::hasSse2()
 bool System::hasSse3()
 {
 	if( ! instance()->mCachedValues[HAS_SSE3] ) {
-#if defined( CINDER_COCOA )	
+#if defined( CINDER_COCOA )
 		instance()->mHasSSE3 = ( getSysCtlValue<int>( "hw.optional.sse3" ) == 1 );
-#else
+#elif defined( CINDER_MSW )
 		instance()->mHasSSE3 = ( instance()->mCPUID_ECX & 0x00000001 ) != 0;
+#elif defined( CINDER_LINUX )
+		instance()->mHasSSE3 =
+				#ifdef __SSE3__
+					1;
+				#else
+					0;
+				#endif
 #endif
 		instance()->mCachedValues[HAS_SSE3] = true;
 	}
@@ -273,8 +287,15 @@ bool System::hasSse4_1()
 	if( ! instance()->mCachedValues[HAS_SSE4_1] ) {
 #if defined( CINDER_COCOA )	
 		instance()->mHasSSE4_1 = ( getSysCtlValue<int>( "hw.optional.sse4_1" ) == 1 );
-#else
+#elif defined( CINDER_MSW )
 		instance()->mHasSSE4_1 = ( instance()->mCPUID_ECX & ( 1 << 19 ) ) != 0;
+#elif defined( CINDER_LINUX )
+		instance()->mHasSSE4_1 =
+				#ifdef __SSE41__
+					1;
+				#else
+					0;
+				#endif
 #endif
 		instance()->mCachedValues[HAS_SSE4_1] = true;
 	}
@@ -287,8 +308,15 @@ bool System::hasSse4_2()
 	if( ! instance()->mCachedValues[HAS_SSE4_2] ) {
 #if defined( CINDER_COCOA )	
 		instance()->mHasSSE4_2 = ( getSysCtlValue<int>( "hw.optional.sse4_2" ) == 1 );
-#else
+#elif defined( CINDER_MSW )
 		instance()->mHasSSE4_2 = ( instance()->mCPUID_ECX & ( 1 << 20 ) ) != 0;
+#elif defined( CINDER_LINUX )
+		instance()->mHasSSE4_2 =
+				#ifdef __SSE42__
+					1;
+				#else
+					0;
+				#endif
 #endif
 		instance()->mCachedValues[HAS_SSE4_2] = true;
 	}
@@ -301,8 +329,15 @@ bool System::hasX86_64()
 	if( ! instance()->mCachedValues[HAS_X86_64] ) {
 #if defined( CINDER_COCOA )	
 		instance()->mHasX86_64 = ( getSysCtlValue<int>( "hw.optional.x86_64" ) == 1 );
-#else
+#elif defined( CINDER_MSW )
 		instance()->mHasX86_64 = ( instance()->mCPUID_EDX & ( 1 << 29 ) ) != 0;
+#elif defined( CINDER_LINUX )
+		instance()->mHasX86_64 =
+				#ifdef __x86_64__
+					1;
+				#else
+					0;
+				#endif
 #endif
 		instance()->mCachedValues[HAS_X86_64] = true;
 	}
@@ -315,7 +350,7 @@ int System::getNumCpus()
 	if( ! instance()->mCachedValues[PHYSICAL_CPUS] ) {
 #if defined( CINDER_COCOA )	
 		instance()->mPhysicalCPUs = getSysCtlValue<int>( "hw.packages" );
-#else
+#elif defined( CINDER_MSW )
 		const int MAX_NUMBER_OF_LOGICAL_PROCESSORS = 96;
 		const int MAX_NUMBER_OF_PHYSICAL_PROCESSORS = 8;
 		const int MAX_NUMBER_OF_IOAPICS = 16;
@@ -343,6 +378,8 @@ int System::getNumCpus()
 		
 		// unlock from a particular logical processor
 		::SetProcessAffinityMask( GetCurrentProcess(), processAffinityMask );
+#elif defined( CINDER_LINUX )
+		instance()->mPhysicalCPUs = 1;
 #endif
 		instance()->mCachedValues[PHYSICAL_CPUS] = true;
 	}
@@ -355,10 +392,12 @@ int System::getNumCores()
 	if( ! instance()->mCachedValues[LOGICAL_CPUS] ) {
 #if defined( CINDER_COCOA )	
 		instance()->mLogicalCPUs = getSysCtlValue<int>( "hw.logicalcpu" );
-#else
+#elif defined( CINDER_MSW )
 		::SYSTEM_INFO sys;
 		::GetSystemInfo( &sys );
 		instance()->mLogicalCPUs = sys.dwNumberOfProcessors;
+#elif defined ( CINDER_LINUX )
+		instance()->mLogicalCPUs = 2;
 #endif
 		instance()->mCachedValues[LOGICAL_CPUS] = true;
 	}
@@ -373,12 +412,14 @@ int System::getOsMajorVersion()
 #if defined( CINDER_COCOA )	
 		if( Gestalt(gestaltSystemVersionMajor, reinterpret_cast<SInt32*>( &(instance()->mOSMajorVersion) ) ) != noErr)
 			throw SystemExcFailedQuery();
-#else
+#elif defined( CIDER_MSW )
 		::OSVERSIONINFOEX info;
 		::ZeroMemory( &info, sizeof( OSVERSIONINFOEX ) );
 		info.dwOSVersionInfoSize = sizeof( OSVERSIONINFOEX );
 		::GetVersionEx( (OSVERSIONINFO *)&info );
 		instance()->mOSMajorVersion = info.dwMajorVersion;
+#elif defined( CINDER_LINUX )
+		instance()->mOSMajorVersion = 2;
 #endif
 		instance()->mCachedValues[OS_MAJOR] = true;
 	}
@@ -392,12 +433,14 @@ int System::getOsMinorVersion()
 #if defined( CINDER_COCOA )	
 		if( Gestalt(gestaltSystemVersionMinor, reinterpret_cast<SInt32*>( &(instance()->mOSMinorVersion) ) ) != noErr)
 			throw SystemExcFailedQuery();
-#else
+#elif defined( CINDER_MSW )
 		::OSVERSIONINFOEX info;
 		::ZeroMemory( &info, sizeof( OSVERSIONINFOEX ) );
 		info.dwOSVersionInfoSize = sizeof( OSVERSIONINFOEX );
 		::GetVersionEx( reinterpret_cast<LPOSVERSIONINFO>( &info ) );
 		instance()->mOSMinorVersion = info.dwMinorVersion;
+#elif defined( CINDER_LINUX )
+		return 26;
 #endif
 		instance()->mCachedValues[OS_MINOR] = true;
 	}
@@ -411,12 +454,14 @@ int System::getOsBugFixVersion()
 #if defined( CINDER_COCOA )	
 		if( Gestalt(gestaltSystemVersionBugFix, reinterpret_cast<SInt32*>( &(instance()->mOSBugFixVersion) ) ) != noErr)
 			throw SystemExcFailedQuery();
-#else
+#elif defined( CINDER_MSW )
 		::OSVERSIONINFOEX info;
 		::ZeroMemory( &info, sizeof( OSVERSIONINFOEX ) );
 		info.dwOSVersionInfoSize = sizeof( OSVERSIONINFOEX );
 		::GetVersionEx( reinterpret_cast<LPOSVERSIONINFO>( &info ) );
 		instance()->mOSBugFixVersion = info.wServicePackMajor;
+#elif defined( CINDER_LINUX)
+		instance()->mOSBugFixVersion = 26;
 #endif
 		instance()->mCachedValues[OS_BUGFIX] = true;
 	}

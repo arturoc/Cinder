@@ -25,7 +25,7 @@
 #include "cinder/Cinder.h"
 
 #if ! defined( CINDER_COCOA_TOUCH )
-	#include "cinder/gl/GLee.h"
+	#include "GLee.h"
 #else
 	#define CINDER_GLES
 	#define CINDER_GLES1

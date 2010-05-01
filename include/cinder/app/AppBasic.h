@@ -132,6 +132,9 @@ class AppBasic : public App {
 #elif defined( CINDER_MSW )
 	class AppImplMswBasic	*mImpl;
 	friend class AppImplMswBasic;
+#elif defined( CINDER_LINUX )
+	class AppImplLinuxBasic	*mImpl;
+	friend class AppImplLinuxBasic;
 #endif
 
 	Settings		mSettings;
@@ -160,5 +163,15 @@ class AppBasic : public App {
 		cinder::app::AppBasic::executeLaunch( app, ren, #APP, -1, 0 );								\
 		cinder::app::AppBasic::cleanupLaunch();														\
 		return 0;																					\
+	}
+#elif defined( CINDER_LINUX )
+	#define CINDER_APP_BASIC( APP, RENDERER )														\
+	int main( int argc, char * const argv[] ) {								\
+		cinder::app::AppBasic::prepareLaunch();								\
+		cinder::app::AppBasic *app = new APP;								\
+		cinder::app::Renderer *ren = new RENDERER;							\
+		cinder::app::AppBasic::executeLaunch( app, ren, #APP, argc, argv );	\
+		cinder::app::AppBasic::cleanupLaunch();								\
+		return 0;															\
 	}
 #endif

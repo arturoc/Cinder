@@ -139,7 +139,7 @@ class Line {
 	void calcExtents();
 #if defined( CINDER_MAC )
 	void render( CGContextRef &cgContext, float currentY, float xBorder, float maxWidth );
-#else
+#elif defined( CINDER_MSW )
 	void render( Gdiplus::Graphics *graphics, float currentY, float xBorder, float maxWidth );
 #endif
 
@@ -469,7 +469,9 @@ Surface renderString( const std::string &str, const Font &font, const ColorA &co
 	::GdiFlush();
 
 	delete offscreenBitmap;
-	delete offscreenGraphics;		
+	delete offscreenGraphics;
+#elif defined( CINDER_LINUX )
+	Surface result( pixelWidth, pixelHeight, true, SurfaceChannelOrder::RGBA );
 #endif	
 
 	if( baselineOffset )

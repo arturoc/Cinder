@@ -80,6 +80,12 @@ class Renderer {
 
 	virtual HWND				getHwnd() = 0;
 	virtual HDC					getDc() { throw; } // the default behavior is failure
+#elif defined( CINDER_LINUX )
+	virtual void setup( class App *aApp ) = 0;
+
+	virtual void prepareToggleFullScreen() {}
+	virtual void finishToggleFullScreen() {}
+	virtual void kill() {}
 #endif
 
 	virtual Surface	copyWindowSurface( const Area &area ) = 0;
@@ -115,6 +121,10 @@ class RendererGl : public Renderer {
 	virtual HWND	getHwnd() { return mWnd; }
 	virtual void	prepareToggleFullScreen();
 	virtual void	finishToggleFullScreen();
+#elif defined( CINDER_LINUX )
+	virtual void	setup( App *aApp );
+	virtual void	kill();
+
 #endif
 
 	enum	{ AA_NONE = 0, AA_MSAA_2, AA_MSAA_4, AA_MSAA_6, AA_MSAA_8, AA_MSAA_16, AA_MSAA_32 };
@@ -136,6 +146,8 @@ class RendererGl : public Renderer {
 #elif defined( CINDER_MSW )
 	class AppImplMswRendererGl	*mImpl;
 	HWND						mWnd;
+#elif defined( CINDER_LINUX )
+	class AppImplLinuxRendererGl * mImpl;
 #endif
 };
 
@@ -192,6 +204,34 @@ class Renderer2d : public Renderer {
 	bool			mDoubleBuffer;
 	HWND			mWnd;
 	HDC				mDC;
+};
+
+#elif defined( CINDER_LINUX )
+
+class Renderer2d : public Renderer {
+ public:
+	Renderer2d( bool doubleBuffer = true );
+
+	virtual void setup( App *aApp);
+	virtual void kill();
+
+	//virtual HWND	getHwnd() { return mWnd; }
+	//virtual HDC		getDc();
+
+	virtual void	prepareToggleFullScreen();
+	virtual void	finishToggleFullScreen();
+
+	virtual void startDraw();
+	virtual void finishDraw();
+	virtual void defaultResize();
+	virtual Surface	copyWindowSurface( const Area &area );
+
+ protected:
+	class AppImplLinuxRendererGl	*mImpl;
+
+	bool			mDoubleBuffer;
+	//HWND			mWnd;
+	//HDC				mDC;
 };
 
 #endif

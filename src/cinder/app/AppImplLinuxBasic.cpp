@@ -34,8 +34,6 @@ using std::string;
 
 namespace cinder { namespace app {
 
-static const wchar_t *WINDOWED_WIN_CLASS_NAME = TEXT("CinderWinClass");
-static const wchar_t *FULLSCREEN_WIN_CLASS_NAME = TEXT("CinderWinFSClass");
 
 AppImplLinuxBasic::AppImplLinuxBasic( AppBasic *aApp )
 	: AppImplLinux( aApp ), mApp( aApp ), mHasBeenInitialized( false )
@@ -69,15 +67,15 @@ void AppImplLinuxBasic::run()
 	mHasBeenInitialized = true;
 	mApp->privateResize__( mWindowWidth, mWindowHeight );
 
-	::ShowWindow( mWnd, SW_SHOW );
+	/*::ShowWindow( mWnd, SW_SHOW );
 	::SetForegroundWindow( mWnd );
 	::SetFocus( mWnd );
-	::DragAcceptFiles( mWnd, TRUE );	
+	::DragAcceptFiles( mWnd, TRUE );*/
 	
 	// initialize our next frame time to be definitely now
 	mNextFrameTime = -1;
 	
-	MSG msg;
+	/*MSG msg;
 	while( ! mShouldQuit ) {
 		if( ::PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) ) {
 			::TranslateMessage( &msg );
@@ -91,7 +89,7 @@ void AppImplLinuxBasic::run()
 		}
 		else
 			::Sleep( 1 );
-	}
+	}*/
 
 	killWindow( mFullScreen );
 	mApp->privateShutdown__();
@@ -100,7 +98,7 @@ void AppImplLinuxBasic::run()
 
 bool AppImplLinuxBasic::createWindow( int *width, int *height )
 {
-	const char *title = "Cinder";
+	/*const char *title = "Cinder";
 	int bits = 32;
 
 	if( *width <= 0 ) {
@@ -192,14 +190,14 @@ bool AppImplLinuxBasic::createWindow( int *width, int *height )
 		return false;
 	}
 
-	mApp->getRenderer()->setup( mApp, mWnd, mDC );
+	mApp->getRenderer()->setup( mApp, mWnd, mDC );*/
 
-	return true;									// Success
+	return false;									// Success
 }
 
 void AppImplLinuxBasic::killWindow( bool wasFullScreen )
 {
-	mApp->getRenderer()->kill();
+	/*mApp->getRenderer()->kill();
 
 	if( wasFullScreen )
 		::ChangeDisplaySettings( NULL, 0 );
@@ -215,12 +213,12 @@ void AppImplLinuxBasic::killWindow( bool wasFullScreen )
 	else
 		::UnregisterClass( WINDOWED_WIN_CLASS_NAME, mInstance );
 
-	mWnd = 0;
+	mWnd = 0;*/
 }
 
 void AppImplLinuxBasic::toggleFullScreen()
 {
-	bool prevFullScreen = mFullScreen;
+	/*bool prevFullScreen = mFullScreen;
 	HDC oldDC = mDC;
 	HWND oldWnd = mWnd;
 	
@@ -260,28 +258,28 @@ void AppImplLinuxBasic::toggleFullScreen()
 	::SetFocus( mWnd );
 	::DragAcceptFiles( mWnd, TRUE );
 	
-	mApp->privateResize__( mApp->getWindowWidth(), mApp->getWindowHeight() );
+	mApp->privateResize__( mApp->getWindowWidth(), mApp->getWindowHeight() );*/
 }
 
 void AppImplLinuxBasic::setWindowWidth( int aWindowWidth )
 {
-	int screenWidth, screenHeight;
+	/*int screenWidth, screenHeight;
 	getScreenSize( aWindowWidth, mApp->getWindowHeight(), &screenWidth, &screenHeight );
-	::SetWindowPos( mWnd, HWND_TOP, 0, 0, screenWidth, screenHeight, SWP_NOMOVE );
+	::SetWindowPos( mWnd, HWND_TOP, 0, 0, screenWidth, screenHeight, SWP_NOMOVE );*/
 }
 
 void AppImplLinuxBasic::setWindowHeight( int aWindowHeight )
 {
-	int screenWidth, screenHeight;
+	/*int screenWidth, screenHeight;
 	getScreenSize( mApp->getWindowWidth(), aWindowHeight, &screenWidth, &screenHeight );
-	::SetWindowPos( mWnd, HWND_TOP, 0, 0, screenWidth, screenHeight, SWP_NOMOVE );
+	::SetWindowPos( mWnd, HWND_TOP, 0, 0, screenWidth, screenHeight, SWP_NOMOVE );*/
 }
 
 void AppImplLinuxBasic::setWindowSize( int aWindowWidth, int aWindowHeight )
 {
-	int screenWidth, screenHeight;
+	/*int screenWidth, screenHeight;
 	getScreenSize( aWindowWidth, aWindowHeight, &screenWidth, &screenHeight );
-	::SetWindowPos( mWnd, HWND_TOP, 0, 0, screenWidth, screenHeight, SWP_NOMOVE );
+	::SetWindowPos( mWnd, HWND_TOP, 0, 0, screenWidth, screenHeight, SWP_NOMOVE );*/
 }
 
 float AppImplLinuxBasic::setFrameRate( float aFrameRate )
@@ -291,15 +289,15 @@ float AppImplLinuxBasic::setFrameRate( float aFrameRate )
 
 void AppImplLinuxBasic::getScreenSize( int clientWidth, int clientHeight, int *resultWidth, int *resultHeight )
 {
-	RECT windowRect;
+	/*RECT windowRect;
 	windowRect.left = windowRect.top = 0;
 	windowRect.right = clientWidth;
 	windowRect.bottom = clientHeight;
 	::AdjustWindowRectEx( &windowRect, mWindowStyle, FALSE, mWindowExStyle );
 	*resultWidth = windowRect.right - windowRect.left;
-	*resultHeight = windowRect.bottom - windowRect.top;
+	*resultHeight = windowRect.bottom - windowRect.top;*/
 }
-
+/*
 unsigned int prepMouseEventModifiers( WPARAM wParam )
 {
 	unsigned int result = 0;
@@ -500,6 +498,6 @@ LRESULT CALLBACK WndProc(	HWND	mWnd,			// Handle For This Window
 	// unhandled messages To DefWindowProc
 	return DefWindowProc( mWnd, uMsg, wParam, lParam );
 }
-} // extern "C"
+} // extern "C"*/
 
 } } // namespace cinder::app

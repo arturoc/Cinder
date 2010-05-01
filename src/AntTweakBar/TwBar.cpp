@@ -15,6 +15,7 @@
 #include "TwMgr.h"
 #include "TwBar.h"
 #include "TwColors.h"
+
   
 using namespace std;
 
@@ -6092,8 +6093,8 @@ bool CTwBar::MouseButton(ETwMouseButtonID _Button, bool _Pressed, int _X, int _Y
         }
         else if( m_IsHelpBar && _Pressed && !g_TwMgr->m_IsRepeatingMousePressed && _X>=m_PosX+m_VarX0 && _X<m_PosX+m_Width-m_Font->m_CharHeight && _Y>m_PosY+m_Height-m_Font->m_CharHeight && _Y<m_PosY+m_Height )
         {
+			const wchar_t *WebPage = L"http://www.antisphere.com/Wiki/tools:anttweakbar";
             #if defined ANT_WINDOWS
-				const wchar_t *WebPage = L"http://www.antisphere.com/Wiki/tools:anttweakbar";
                 ShellExecute(NULL, L"open", WebPage, NULL, NULL, SW_SHOWNORMAL);
             #elif defined ANT_UNIX         
 				// brute force: try all the possible browsers (I don't know how to find the default one; someone?)

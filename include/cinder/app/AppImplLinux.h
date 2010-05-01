@@ -22,51 +22,48 @@
 
 #pragma once
 
-#include <windows.h>
-#undef min
-#undef max
-
-#include "cinder/app/AppImplMsw.h"
-#include "cinder/app/AppImplMswRenderer.h"
-#include "cinder/Display.h"
+#include "cinder/Stream.h"
+#include "cinder/Vector.h"
+#include <string>
+#include <vector>
 
 namespace cinder { namespace app {
 
-
-class AppImplMswBasic : public AppImplMsw {
+class AppImplLinux {
  public:
-	AppImplMswBasic( class AppBasic *aApp  );
-	void	run();
-
-	class AppBasic*		getApp() { return mApp; }
+	AppImplLinux( class App *aApp ) : mApp( aApp ), mWindowOffset( 0, 0 ) {}
+	virtual ~AppImplLinux() {}
 	
-	void	quit() { mShouldQuit = true; }
+	int				getWindowWidth() const { return mWindowWidth; }
+	int				getWindowHeight() const { return mWindowHeight; }
+	virtual void	setWindowWidth( int aWindowWidth ) { }
+	virtual void	setWindowHeight( int aWindowHeight ) { }
+	virtual void	setWindowSize( int aWindowWidth, int aWindowHeight ) {}
+	float			getFrameRate() const { return mFrameRate; }
+	virtual float	setFrameRate( float aFrameRate ) { return -1.0f; }
+	bool			isFullScreen() const { return mFullScreen; }
+	virtual void	toggleFullScreen() {}
+	virtual Vec2i	mouseLocation();
+	virtual void	quit() = 0;
 	
-	void	setWindowWidth( int aWindowWidth );
-	void	setWindowHeight( int aWindowHeight );
-	void	setWindowSize( int aWindowWidth, int aWindowHeight );
-	float	setFrameRate( float aFrameRate );
-	void	toggleFullScreen();
+	virtual void	privateSetWindowOffset__( const Vec2i &aWindowOffset ) { mWindowOffset = aWindowOffset; }
 	
-	std::string getAppPath() const;
 	
-	Display*	getDisplay() { return mDisplay; }
+	static void	hideCursor();
+	static void	showCursor();
+	
+	static Buffer	loadResource( int id, const std::string &type );
+	
+	static std::string	getAppPath();	
+	static std::string	getOpenFilePath( const std::string &initialPath, std::vector<std::string> extensions );
+	static std::string	getSaveFilePath( const std::string &initialPath, std::vector<std::string> extensions );
 	
  protected:
-	bool		createWindow( int *width, int *height );
-	void		killWindow( bool wasFullScreen );
-	void		getScreenSize( int clientWidth, int clientHeight, int *resultWidth, int *resultHeight );
-	
-	bool		mShouldQuit;
-	bool		mIsDragging;
-	bool		mHasBeenInitialized;
-	class AppBasic	*mApp;
-	
-	// Windows window variables
-	double				mNextFrameTime;
-	Display				*mDisplay;
-
-	//friend LRESULT CALLBACK WndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
+	class App	*mApp;
+	int			mWindowWidth, mWindowHeight;	
+	bool		mFullScreen;
+	Vec2i		mWindowOffset;
+	float		mFrameRate; 
 };
 
 } } // namespace cinder::app
